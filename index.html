@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Marco Travel</title>
+  <meta name="description" content="Dashboard admin untuk mengelola paket travel Marco Travel">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Mobile Toggle -->
+  <button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+  <!-- ======== SIDEBAR ======== -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🕌</div>
+      <div>
+        <h2>Marco Travel</h2>
+        <span>Admin Dashboard</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item active" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="#" onclick="document.getElementById('tableCard').scrollIntoView({behavior:'smooth'})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        Paket Travel
+      </a>
+      <a class="nav-item" href="https://marco-travel.vercel.app" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Lihat Website
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar">A</div>
+        <div>
+          <div class="user-name">Admin</div>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ======== MAIN CONTENT ======== -->
+  <main class="main-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1>Dashboard Paket Travel</h1>
+        <p>Kelola semua paket haji & umroh Marco Travel</p>
+      </div>
+      <button class="btn-primary" onclick="openModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Tambah Paket
+      </button>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon green">📦</div>
+        <div class="stat-info">
+          <h3 id="statTotal">0</h3>
+          <p>Total Paket</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon gold">⭐</div>
+        <div class="stat-info">
+          <h3 id="statHighlight">0</h3>
+          <p>Paket Highlight</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">🛫</div>
+        <div class="stat-info">
+          <h3 id="statKeberangkatan">-</h3>
+          <p>Keberangkatan Terdekat</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">💰</div>
+        <div class="stat-info">
+          <h3 id="statHarga">-</h3>
+          <p>Harga Terendah</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card" id="tableCard">
+      <div class="table-toolbar">
+        <h2>Daftar Paket Travel</h2>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="Cari paket..." oninput="filterTable()">
+        </div>
+      </div>
+
+      <div id="tableContainer">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======== MODAL FORM ======== -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Tambah Paket Baru</h2>
+        <button class="btn-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="paketForm" onsubmit="handleSubmit(event)">
+          <input type="hidden" id="formId">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Nama Paket *</label>
+              <input type="text" id="formNama" required placeholder="Contoh: Umroh Reguler 2026">
+            </div>
+            <div class="form-group">
+              <label>Harga *</label>
+              <input type="text" id="formHarga" required placeholder="Rp 32.500.000">
+            </div>
+            <div class="form-group">
+              <label>Durasi *</label>
+              <input type="text" id="formDurasi" required placeholder="12 Hari">
+            </div>
+            <div class="form-group">
+              <label>Kapasitas *</label>
+              <input type="text" id="formKapasitas" required placeholder="Setiap Bulan">
+            </div>
+            <div class="form-group">
+              <label>Rating (1-5)</label>
+              <select id="formRating">
+                <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                <option value="4">⭐⭐⭐⭐ (4)</option>
+                <option value="3">⭐⭐⭐ (3)</option>
+                <option value="2">⭐⭐ (2)</option>
+                <option value="1">⭐ (1)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Badge</label>
+              <input type="text" id="formBadge" placeholder="TERPOPULER, SPESIAL, dll">
+            </div>
+            <div class="form-group">
+              <label>Warna Badge</label>
+              <select id="formBadgeColor">
+                <option value="">-- Pilih Warna --</option>
+                <option value="bg-red-500">Merah</option>
+                <option value="bg-[#1a5c3a]">Hijau</option>
+                <option value="bg-[#c9a84c]">Emas</option>
+                <option value="bg-purple-600">Ungu</option>
+                <option value="bg-blue-500">Biru</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Path Gambar</label>
+              <input type="text" id="formImage" placeholder="/images/umroh-reguler.jpg">
+            </div>
+            <div class="form-group">
+              <label>Keberangkatan *</label>
+              <input type="text" id="formKeberangkatan" required placeholder="Juni 2026">
+            </div>
+            <div class="form-group">
+              <label>Maskapai *</label>
+              <input type="text" id="formMaskapai" required placeholder="Garuda Indonesia">
+            </div>
+            <div class="form-group">
+              <label>Hotel *</label>
+              <input type="text" id="formHotel" required placeholder="Hilton Makkah">
+            </div>
+            <div class="form-group">
+              <label>Highlight</label>
+              <select id="formHighlight">
+                <option value="0">Tidak</option>
+                <option value="1">Ya</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Link WhatsApp *</label>
+              <input type="text" id="formWa" required placeholder="https://wa.me/6281234567890?text=...">
+            </div>
+            <div class="form-group full">
+              <label>Deskripsi *</label>
+              <textarea id="formDeskripsi" required placeholder="Deskripsi lengkap paket travel..."></textarea>
+            </div>
+            <div class="form-group full">
+              <label>Fasilitas</label>
+              <textarea id="formFasilitas" rows="3" placeholder="Satu fasilitas per baris"></textarea>
+              <small>Tulis satu fasilitas per baris</small>
+            </div>
+            <div class="form-group full">
+              <label>Itinerary</label>
+              <textarea id="formItinerary" rows="4" placeholder="Hari 1: Keberangkatan Jakarta&#10;Hari 2-5: Madinah"></textarea>
+              <small>Tulis satu jadwal per baris</small>
+            </div>
+            <div class="form-group">
+              <label>Sudah Termasuk</label>
+              <textarea id="formIncludes" rows="4" placeholder="Tiket PP&#10;Hotel Bintang 5&#10;Visa"></textarea>
+              <small>Satu item per baris</small>
+            </div>
+            <div class="form-group">
+              <label>Tidak Termasuk</label>
+              <textarea id="formExcludes" rows="4" placeholder="Biaya personal&#10;Oleh-oleh"></textarea>
+              <small>Satu item per baris</small>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Batal</button>
+        <button class="btn-submit" onclick="document.getElementById('paketForm').requestSubmit()">Simpan Paket</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== CONFIRM DIALOG ======== -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <div class="icon">⚠️</div>
+      <h3>Hapus Paket?</h3>
+      <p id="confirmText">Apakah Anda yakin ingin menghapus paket ini? Tindakan ini tidak bisa dibatalkan.</p>
+      <div class="btn-group">
+        <button class="btn-secondary" onclick="closeConfirm()">Batal</button>
+        <button class="btn-danger" id="confirmDeleteBtn">Ya, Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
