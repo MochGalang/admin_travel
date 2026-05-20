@@ -3,7 +3,7 @@
  * CRUD Operations via Fetch API
  */
 
-const API_URL = '../api/paket.php';
+const API_URL = 'https://admin-api.42web.io/paket.php';
 let allPakets = [];
 
 // ============================================
