@@ -4,7 +4,7 @@
  */
 
 
-const API_URL = 'https://admin-api.42web.io/paket.php';
+const API_URL = 'https://admin-api-tau.vercel.app/api/paket';
 let allPakets = [];
 
 // ============================================
