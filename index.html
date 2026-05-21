@@ -23,13 +23,17 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a class="nav-item active" href="#">
+      <a class="nav-item active" href="#" onclick="showPage('dashboard')" id="navDashboard">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Dashboard
       </a>
-      <a class="nav-item" href="#" onclick="document.getElementById('tableCard').scrollIntoView({behavior:'smooth'})">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-        Paket Travel
+      <a class="nav-item" href="#" onclick="showPage('galeri')" id="navGaleri">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Kelola Galeri
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('pengaturan')" id="navPengaturan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Pengaturan Kontak
       </a>
       <a class="nav-item" href="https://marco-travel.vercel.app" target="_blank">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -51,68 +55,140 @@
   <!-- ======== MAIN CONTENT ======== -->
   <main class="main-content">
 
-    <!-- Page Header -->
-    <div class="page-header">
-      <div>
-        <h1>Dashboard Paket Travel</h1>
-        <p>Kelola semua paket haji & umroh Marco Travel</p>
+    <!-- ====== PAGE: DASHBOARD (Paket Travel) ====== -->
+    <div id="pageDashboard">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1>Dashboard Paket Travel</h1>
+          <p>Kelola semua paket haji &amp; umroh Marco Travel</p>
+        </div>
+        <button class="btn-primary" onclick="openModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Paket
+        </button>
       </div>
-      <button class="btn-primary" onclick="openModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Tambah Paket
-      </button>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon green">📦</div>
+          <div class="stat-info">
+            <h3 id="statTotal">0</h3>
+            <p>Total Paket</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gold">⭐</div>
+          <div class="stat-info">
+            <h3 id="statHighlight">0</h3>
+            <p>Paket Highlight</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">🛫</div>
+          <div class="stat-info">
+            <h3 id="statKeberangkatan">-</h3>
+            <p>Keberangkatan Terdekat</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple">💰</div>
+          <div class="stat-info">
+            <h3 id="statHarga">-</h3>
+            <p>Harga Terendah</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Card -->
+      <div class="table-card" id="tableCard">
+        <div class="table-toolbar">
+          <h2>Daftar Paket Travel</h2>
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Cari paket..." oninput="filterTable()">
+          </div>
+        </div>
+
+        <div id="tableContainer">
+          <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+      </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon green">📦</div>
-        <div class="stat-info">
-          <h3 id="statTotal">0</h3>
-          <p>Total Paket</p>
+    <!-- ====== PAGE: GALERI ====== -->
+    <div id="pageGaleri" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1>Kelola Galeri</h1>
+          <p>Tambah, edit, dan hapus foto galeri website</p>
         </div>
+        <button class="btn-primary" onclick="openGaleriModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Foto
+        </button>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon gold">⭐</div>
-        <div class="stat-info">
-          <h3 id="statHighlight">0</h3>
-          <p>Paket Highlight</p>
+
+      <div class="table-card">
+        <div class="table-toolbar">
+          <h2>Daftar Foto Galeri</h2>
+          <div class="stat-info" style="text-align:right">
+            <h3 id="statGaleriTotal">0</h3>
+            <p>Total Foto</p>
+          </div>
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon blue">🛫</div>
-        <div class="stat-info">
-          <h3 id="statKeberangkatan">-</h3>
-          <p>Keberangkatan Terdekat</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon purple">💰</div>
-        <div class="stat-info">
-          <h3 id="statHarga">-</h3>
-          <p>Harga Terendah</p>
+        <div id="galeriContainer">
+          <div class="loading-spinner"><div class="spinner"></div></div>
         </div>
       </div>
     </div>
 
-    <!-- Table Card -->
-    <div class="table-card" id="tableCard">
-      <div class="table-toolbar">
-        <h2>Daftar Paket Travel</h2>
-        <div class="search-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="searchInput" placeholder="Cari paket..." oninput="filterTable()">
+    <!-- ====== PAGE: PENGATURAN KONTAK ====== -->
+    <div id="pagePengaturan" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1>Pengaturan Kontak</h1>
+          <p>Ubah informasi kontak yang ditampilkan di footer website</p>
         </div>
       </div>
 
-      <div id="tableContainer">
-        <div class="loading-spinner"><div class="spinner"></div></div>
+      <div class="table-card">
+        <div class="table-toolbar">
+          <h2>Informasi Kontak Footer</h2>
+        </div>
+        <div style="padding: 24px;">
+          <form id="pengaturanForm" onsubmit="handlePengaturanSubmit(event)">
+            <div class="form-grid">
+              <div class="form-group full">
+                <label>Alamat Lengkap</label>
+                <textarea id="settingAlamat" rows="2" placeholder="Jl. Sudirman No. 88, Lantai 12, Jakarta Pusat"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Nomor Telepon</label>
+                <input type="text" id="settingTelepon" placeholder="+62 812-3456-7890">
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="text" id="settingEmail" placeholder="info@marcotour.co.id">
+              </div>
+              <div class="form-group full">
+                <label>Link WhatsApp</label>
+                <input type="text" id="settingWhatsapp" placeholder="https://wa.me/6281234567890">
+                <small>Format: https://wa.me/628xxxxxxxxxx</small>
+              </div>
+            </div>
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn-submit">💾 Simpan Pengaturan</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
 
   </main>
 
-  <!-- ======== MODAL FORM ======== -->
+  <!-- ======== MODAL FORM PAKET ======== -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
       <div class="modal-header">
@@ -225,12 +301,52 @@
     </div>
   </div>
 
+  <!-- ======== MODAL FORM GALERI ======== -->
+  <div class="modal-overlay" id="galeriModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="galeriModalTitle">Tambah Foto Galeri</h2>
+        <button class="btn-close" onclick="closeGaleriModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="galeriForm" onsubmit="handleGaleriSubmit(event)">
+          <input type="hidden" id="galeriFormId">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>URL Gambar *</label>
+              <input type="text" id="galeriFormImage" required placeholder="https://example.com/foto.jpg atau /images/foto.jpg">
+            </div>
+            <div class="form-group">
+              <label>Judul / Keterangan</label>
+              <input type="text" id="galeriFormTitle" placeholder="Masjidil Haram, Makkah">
+            </div>
+            <div class="form-group">
+              <label>Kategori</label>
+              <input type="text" id="galeriFormCategory" placeholder="Ibadah, Persiapan, Tour Plus">
+            </div>
+            <div class="form-group">
+              <label>Ukuran Tinggi (Tall)</label>
+              <select id="galeriFormTall">
+                <option value="0">Normal (Kotak)</option>
+                <option value="1">Tinggi (Portrait)</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeGaleriModal()">Batal</button>
+        <button class="btn-submit" onclick="document.getElementById('galeriForm').requestSubmit()">Simpan Foto</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ======== CONFIRM DIALOG ======== -->
   <div class="confirm-overlay" id="confirmOverlay">
     <div class="confirm-box">
       <div class="icon">⚠️</div>
-      <h3>Hapus Paket?</h3>
-      <p id="confirmText">Apakah Anda yakin ingin menghapus paket ini? Tindakan ini tidak bisa dibatalkan.</p>
+      <h3 id="confirmTitle">Hapus?</h3>
+      <p id="confirmText">Apakah Anda yakin? Tindakan ini tidak bisa dibatalkan.</p>
       <div class="btn-group">
         <button class="btn-secondary" onclick="closeConfirm()">Batal</button>
         <button class="btn-danger" id="confirmDeleteBtn">Ya, Hapus</button>
@@ -242,5 +358,6 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script src="js/app.js"></script>
+
 </body>
 </html>

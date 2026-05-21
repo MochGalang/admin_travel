@@ -1,28 +1,73 @@
 /**
  * Marco Travel - Admin Panel JavaScript
- * CRUD Operations via Fetch API
+ * CRUD Operations via Fetch API for Packages, Gallery, and Settings
  */
 
+// Otomatis deteksi lingkungan (lokal vs produksi)
+const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000/api'
+  : 'https://admin-api-tau.vercel.app/api';
 
-const API_URL = 'https://admin-api-tau.vercel.app/api/paket';
+const API_PAKET = `${BASE_URL}/paket`;
+const API_GALERI = `${BASE_URL}/galeri`;
+const API_PENGATURAN = `${BASE_URL}/pengaturan`;
+
 let allPakets = [];
+let allGaleri = [];
 
 // ============================================
 // INIT
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-  loadPakets();
+  // Load default page
+  showPage('dashboard');
 });
 
 // ============================================
-// LOAD DATA
+// PAGE SWITCHER
+// ============================================
+function showPage(pageId) {
+  // Sembunyikan semua halaman
+  document.getElementById('pageDashboard').style.display = 'none';
+  document.getElementById('pageGaleri').style.display = 'none';
+  document.getElementById('pagePengaturan').style.display = 'none';
+
+  // Hapus kelas aktif di navigasi
+  document.getElementById('navDashboard').classList.remove('active');
+  document.getElementById('navGaleri').classList.remove('active');
+  document.getElementById('navPengaturan').classList.remove('active');
+
+  // Tampilkan halaman aktif & beri tanda aktif di sidebar
+  if (pageId === 'dashboard') {
+    document.getElementById('pageDashboard').style.display = 'block';
+    document.getElementById('navDashboard').classList.add('active');
+    loadPakets();
+  } else if (pageId === 'galeri') {
+    document.getElementById('pageGaleri').style.display = 'block';
+    document.getElementById('navGaleri').classList.add('active');
+    loadGaleri();
+  } else if (pageId === 'pengaturan') {
+    document.getElementById('pagePengaturan').style.display = 'block';
+    document.getElementById('navPengaturan').classList.add('active');
+    loadPengaturan();
+  }
+
+  // Tutup sidebar di versi mobile jika terbuka
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+  }
+}
+
+// ============================================
+// LOAD PAKET DATA
 // ============================================
 async function loadPakets() {
   const container = document.getElementById('tableContainer');
   container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
 
   try {
-    const res = await fetch(API_URL);
+    const res = await fetch(API_PAKET);
     const json = await res.json();
 
     if (json.success) {
@@ -30,15 +75,15 @@ async function loadPakets() {
       renderStats();
       renderTable(allPakets);
     } else {
-      container.innerHTML = '<div class="empty-state"><h3>Gagal memuat data</h3><p>' + json.message + '</p></div>';
+      container.innerHTML = `<div class="empty-state"><h3>Gagal memuat data</h3><p>${json.message}</p></div>`;
     }
   } catch (err) {
-    container.innerHTML = '<div class="empty-state"><h3>Tidak dapat terhubung ke server</h3><p>Pastikan XAMPP dan MySQL sudah berjalan, lalu refresh halaman ini.</p></div>';
+    container.innerHTML = '<div class="empty-state"><h3>Tidak dapat terhubung ke server</h3><p>Pastikan Express server Anda berjalan.</p></div>';
   }
 }
 
 // ============================================
-// RENDER STATS
+// RENDER STATS (PAKET)
 // ============================================
 function renderStats() {
   document.getElementById('statTotal').textContent = allPakets.length;
@@ -58,7 +103,7 @@ function renderStats() {
 }
 
 // ============================================
-// RENDER TABLE
+// RENDER PAKET TABLE
 // ============================================
 function renderTable(data) {
   const container = document.getElementById('tableContainer');
@@ -113,7 +158,7 @@ function renderTable(data) {
           <button class="btn-icon" title="Edit" onclick="editPaket(${p.id})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="btn-icon delete" title="Hapus" onclick="confirmDelete(${p.id}, '${p.nama.replace(/'/g, "\\'")}')">
+          <button class="btn-icon delete" title="Hapus" onclick="confirmDelete(${p.id}, '${p.nama.replace(/'/g, "\\'")}', 'paket')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           </button>
         </div>
@@ -135,7 +180,7 @@ function getBadgeClass(color) {
 }
 
 // ============================================
-// SEARCH / FILTER
+// SEARCH / FILTER (PAKET)
 // ============================================
 function filterTable() {
   const q = document.getElementById('searchInput').value.toLowerCase();
@@ -149,7 +194,7 @@ function filterTable() {
 }
 
 // ============================================
-// MODAL - OPEN / CLOSE
+// MODAL PAKET - OPEN / CLOSE
 // ============================================
 function openModal(editData = null) {
   const overlay = document.getElementById('modalOverlay');
@@ -191,11 +236,11 @@ function closeModal() {
 }
 
 // ============================================
-// EDIT - Load data into modal
+// EDIT PAKET - Load data into modal
 // ============================================
 async function editPaket(id) {
   try {
-    const res = await fetch(`${API_URL}?id=${id}`);
+    const res = await fetch(`${API_PAKET}?id=${id}`);
     const json = await res.json();
     if (json.success) {
       openModal(json.data);
@@ -208,7 +253,7 @@ async function editPaket(id) {
 }
 
 // ============================================
-// FORM SUBMIT (CREATE / UPDATE)
+// FORM PAKET SUBMIT (CREATE / UPDATE)
 // ============================================
 async function handleSubmit(e) {
   e.preventDefault();
@@ -216,7 +261,6 @@ async function handleSubmit(e) {
   const id = document.getElementById('formId').value;
   const isEdit = !!id;
 
-  // Collect text areas → arrays
   const toArray = (val) => val.split('\n').map(s => s.trim()).filter(s => s.length > 0);
 
   const payload = {
@@ -231,7 +275,7 @@ async function handleSubmit(e) {
     keberangkatan: document.getElementById('formKeberangkatan').value.trim(),
     maskapai: document.getElementById('formMaskapai').value.trim(),
     hotel: document.getElementById('formHotel').value.trim(),
-    highlight: parseInt(document.getElementById('formHighlight').value),
+    highlight: parseInt(document.getElementById('formHighlight').value) === 1,
     wa: document.getElementById('formWa').value.trim(),
     deskripsi: document.getElementById('formDeskripsi').value.trim(),
     fasilitas: toArray(document.getElementById('formFasilitas').value),
@@ -243,7 +287,7 @@ async function handleSubmit(e) {
   if (isEdit) payload.id = parseInt(id);
 
   try {
-    const res = await fetch(API_URL, {
+    const res = await fetch(API_PAKET, {
       method: isEdit ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -264,33 +308,272 @@ async function handleSubmit(e) {
 }
 
 // ============================================
+// LOAD GALERI DATA
+// ============================================
+async function loadGaleri() {
+  const container = document.getElementById('galeriContainer');
+  container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+  try {
+    const res = await fetch(API_GALERI);
+    const json = await res.json();
+
+    if (json.success) {
+      allGaleri = json.data;
+      document.getElementById('statGaleriTotal').textContent = allGaleri.length;
+      renderGaleriTable(allGaleri);
+    } else {
+      container.innerHTML = `<div class="empty-state"><h3>Gagal memuat data galeri</h3><p>${json.message}</p></div>`;
+    }
+  } catch (err) {
+    container.innerHTML = '<div class="empty-state"><h3>Tidak dapat terhubung ke server</h3><p>Pastikan Express server Anda berjalan.</p></div>';
+  }
+}
+
+// ============================================
+// RENDER GALERI TABLE
+// ============================================
+function renderGaleriTable(data) {
+  const container = document.getElementById('galeriContainer');
+
+  if (data.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <h3>Belum ada foto galeri</h3>
+        <p>Klik tombol "Tambah Foto" untuk menambahkan foto baru</p>
+      </div>`;
+    return;
+  }
+
+  let html = `<table class="data-table">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Gambar</th>
+        <th>Judul / Keterangan</th>
+        <th>Kategori</th>
+        <th>Aspek Rasio</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  data.forEach((g, i) => {
+    html += `<tr>
+      <td>${i + 1}</td>
+      <td>
+        <div class="td-paket">
+          <img src="${g.image}" alt="${g.title}" onerror="this.src='https://placehold.co/48x48/1a5c3a/fff?text=🖼️'" style="width: 60px; height: 48px; border-radius: 6px;">
+        </div>
+      </td>
+      <td><strong>${g.title || '-'}</strong></td>
+      <td><span class="badge-cell badge-green">${g.category || 'Galeri'}</span></td>
+      <td>${g.tall ? 'Portrait (Tinggi)' : 'Landscape/Square'}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn-icon" title="Edit" onclick="editGaleri(${g.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-icon delete" title="Hapus" onclick="confirmDelete(${g.id}, '${(g.title || 'Foto ' + g.id).replace(/'/g, "\\'")}', 'galeri')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ============================================
+// MODAL GALERI - OPEN / CLOSE
+// ============================================
+function openGaleriModal(editData = null) {
+  const overlay = document.getElementById('galeriModalOverlay');
+  const title = document.getElementById('galeriModalTitle');
+  const form = document.getElementById('galeriForm');
+  form.reset();
+  document.getElementById('galeriFormId').value = '';
+
+  if (editData) {
+    title.textContent = 'Edit Foto Galeri';
+    document.getElementById('galeriFormId').value = editData.id;
+    document.getElementById('galeriFormImage').value = editData.image;
+    document.getElementById('galeriFormTitle').value = editData.title || '';
+    document.getElementById('galeriFormCategory').value = editData.category || '';
+    document.getElementById('galeriFormTall').value = editData.tall ? '1' : '0';
+  } else {
+    title.textContent = 'Tambah Foto Galeri';
+  }
+
+  overlay.classList.add('active');
+}
+
+function closeGaleriModal() {
+  document.getElementById('galeriModalOverlay').classList.remove('active');
+}
+
+// ============================================
+// EDIT GALERI - Load data into modal
+// ============================================
+async function editGaleri(id) {
+  const item = allGaleri.find(g => g.id === id);
+  if (item) {
+    openGaleriModal(item);
+  } else {
+    showToast('Foto tidak ditemukan', 'error');
+  }
+}
+
+// ============================================
+// FORM GALERI SUBMIT (CREATE / UPDATE)
+// ============================================
+async function handleGaleriSubmit(e) {
+  e.preventDefault();
+
+  const id = document.getElementById('galeriFormId').value;
+  const isEdit = !!id;
+
+  const payload = {
+    image: document.getElementById('galeriFormImage').value.trim(),
+    title: document.getElementById('galeriFormTitle').value.trim(),
+    category: document.getElementById('galeriFormCategory').value.trim(),
+    tall: parseInt(document.getElementById('galeriFormTall').value) === 1
+  };
+
+  if (isEdit) payload.id = parseInt(id);
+
+  try {
+    const res = await fetch(API_GALERI, {
+      method: isEdit ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const json = await res.json();
+
+    if (json.success) {
+      showToast(isEdit ? 'Foto galeri berhasil diperbarui!' : 'Foto galeri berhasil ditambahkan!', 'success');
+      closeGaleriModal();
+      loadGaleri();
+    } else {
+      showToast(json.message || 'Terjadi kesalahan', 'error');
+    }
+  } catch {
+    showToast('Tidak dapat terhubung ke server', 'error');
+  }
+}
+
+// ============================================
+// LOAD PENGATURAN (CONTACT INFO)
+// ============================================
+async function loadPengaturan() {
+  const form = document.getElementById('pengaturanForm');
+  // Disable form inputs during loading
+  const inputs = form.querySelectorAll('input, textarea, button');
+  inputs.forEach(el => el.disabled = true);
+
+  try {
+    const res = await fetch(API_PENGATURAN);
+    const json = await res.json();
+
+    if (json.success && json.data) {
+      document.getElementById('settingAlamat').value = json.data.alamat || '';
+      document.getElementById('settingTelepon').value = json.data.telepon || '';
+      document.getElementById('settingEmail').value = json.data.email || '';
+      document.getElementById('settingWhatsapp').value = json.data.whatsapp || '';
+    } else {
+      showToast('Gagal memuat pengaturan', 'error');
+    }
+  } catch {
+    showToast('Gagal terhubung ke server pengaturan', 'error');
+  } finally {
+    inputs.forEach(el => el.disabled = false);
+  }
+}
+
+// ============================================
+// SAVE PENGATURAN SUBMIT (PUT)
+// ============================================
+async function handlePengaturanSubmit(e) {
+  e.preventDefault();
+
+  const payload = {
+    alamat: document.getElementById('settingAlamat').value.trim(),
+    telepon: document.getElementById('settingTelepon').value.trim(),
+    email: document.getElementById('settingEmail').value.trim(),
+    whatsapp: document.getElementById('settingWhatsapp').value.trim(),
+  };
+
+  try {
+    const res = await fetch(API_PENGATURAN, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const json = await res.json();
+
+    if (json.success) {
+      showToast('Pengaturan footer berhasil disimpan!', 'success');
+      loadPengaturan();
+    } else {
+      showToast(json.message || 'Gagal menyimpan pengaturan', 'error');
+    }
+  } catch {
+    showToast('Tidak dapat terhubung ke server', 'error');
+  }
+}
+
+// ============================================
 // DELETE - Confirm & Execute
 // ============================================
 let deleteTargetId = null;
+let deleteTargetType = null; // 'paket' atau 'galeri'
 
-function confirmDelete(id, nama) {
+function confirmDelete(id, name, type) {
   deleteTargetId = id;
-  document.getElementById('confirmText').textContent = `Apakah Anda yakin ingin menghapus paket "${nama}"? Tindakan ini tidak bisa dibatalkan.`;
-  document.getElementById('confirmOverlay').classList.add('active');
+  deleteTargetType = type;
 
+  const titleEl = document.getElementById('confirmTitle');
+  const textEl = document.getElementById('confirmText');
+
+  if (type === 'paket') {
+    titleEl.textContent = 'Hapus Paket?';
+    textEl.textContent = `Apakah Anda yakin ingin menghapus paket "${name}"? Tindakan ini tidak bisa dibatalkan.`;
+  } else {
+    titleEl.textContent = 'Hapus Foto?';
+    textEl.textContent = `Apakah Anda yakin ingin menghapus foto "${name}" dari galeri? Tindakan ini tidak bisa dibatalkan.`;
+  }
+
+  document.getElementById('confirmOverlay').classList.add('active');
   document.getElementById('confirmDeleteBtn').onclick = () => executeDel();
 }
 
 function closeConfirm() {
   document.getElementById('confirmOverlay').classList.remove('active');
   deleteTargetId = null;
+  deleteTargetType = null;
 }
 
 async function executeDel() {
-  if (!deleteTargetId) return;
+  if (!deleteTargetId || !deleteTargetType) return;
+
+  const apiEndpoint = deleteTargetType === 'paket' ? API_PAKET : API_GALERI;
 
   try {
-    const res = await fetch(`${API_URL}?id=${deleteTargetId}`, { method: 'DELETE' });
+    const res = await fetch(`${apiEndpoint}?id=${deleteTargetId}`, { method: 'DELETE' });
     const json = await res.json();
 
     if (json.success) {
-      showToast('Paket berhasil dihapus!', 'success');
-      loadPakets();
+      showToast(deleteTargetType === 'paket' ? 'Paket berhasil dihapus!' : 'Foto galeri berhasil dihapus!', 'success');
+      if (deleteTargetType === 'paket') {
+        loadPakets();
+      } else {
+        loadGaleri();
+      }
     } else {
       showToast(json.message || 'Gagal menghapus', 'error');
     }
